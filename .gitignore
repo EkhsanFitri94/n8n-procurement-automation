@@ -1,0 +1,9 @@
+# Secrets and runtime
+.env
+.n8n/
+
+# OS and editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
