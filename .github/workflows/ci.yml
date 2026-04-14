@@ -1,0 +1,41 @@
+name: n8n Workflow CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+jobs:
+  validate-json:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate workflow JSON files
+        run: |
+          python3 - <<'PY'
+          import glob
+          import json
+          import sys
+
+          files = sorted(glob.glob('workflows/examples/*.json'))
+          if not files:
+              print('No example workflow files found in workflows/examples')
+              sys.exit(1)
+
+          failed = False
+          for path in files:
+              try:
+                  with open(path, 'r', encoding='utf-8') as f:
+                      json.load(f)
+                  print(f'OK: {path}')
+              except Exception as e:
+                  failed = True
+                  print(f'ERROR: {path}: {e}')
+
+          if failed:
+              sys.exit(1)
+          PY

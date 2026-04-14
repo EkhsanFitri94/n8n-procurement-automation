@@ -31,6 +31,12 @@ n8n-procurement-automation/
 cp .env.example .env
 ```
 
+Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env
+```
+
 2. Edit `.env` and set secure values:
 
 - `N8N_BASIC_AUTH_USER`
@@ -41,6 +47,12 @@ cp .env.example .env
 
 ```bash
 docker compose up -d
+```
+
+Windows helper (creates `.env` if missing, then starts Docker):
+
+```powershell
+.\scripts\start.ps1
 ```
 
 4. Open n8n:
@@ -73,3 +85,7 @@ git push -u origin main
 - `.n8n/` runtime data is ignored by git.
 - Do not commit `.env` with real credentials.
 - For production, run behind HTTPS reverse proxy.
+
+## CI
+
+- GitHub Actions validates that example workflow JSON files are syntactically correct on each push and pull request.
