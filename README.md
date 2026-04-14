@@ -20,7 +20,8 @@ n8n-procurement-automation/
 └── workflows/
     └── examples/
         ├── 01_manual_test_workflow.json
-        └── 02_daily_procurement_stub.json
+        ├── 02_daily_procurement_stub.json
+        └── 03_vendor_followup_email_draft.json
 ```
 
 ## Quick Start
@@ -66,6 +67,11 @@ In n8n UI:
 1. Create new workflow
 2. Click menu (three dots) -> Import from file
 3. Choose files from `workflows/examples/`
+
+Suggested first practical workflow:
+
+- `03_vendor_followup_email_draft.json`: daily draft message for overdue procurement follow-up.
+- Replace the final "Draft Reminder Message" node with your real Email or Telegram node.
 
 ## GitHub Upload
 

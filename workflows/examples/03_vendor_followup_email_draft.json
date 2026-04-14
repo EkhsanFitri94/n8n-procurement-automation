@@ -1,0 +1,134 @@
+{
+  "name": "03 - Vendor Follow-up Email Draft",
+  "nodes": [
+    {
+      "parameters": {
+        "triggerTimes": {
+          "item": [
+            {
+              "mode": "everyDay",
+              "hour": 10,
+              "minute": 0
+            }
+          ]
+        }
+      },
+      "id": "cron_daily_followup",
+      "name": "Daily Trigger",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [
+        260,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "vendor_name",
+              "value": "ABC Supplier Sdn Bhd"
+            },
+            {
+              "name": "vendor_email",
+              "value": "vendor@example.com"
+            },
+            {
+              "name": "department",
+              "value": "Procurement"
+            },
+            {
+              "name": "po_number",
+              "value": "PO-2025-1142"
+            },
+            {
+              "name": "invoice_number",
+              "value": "INV-8891"
+            },
+            {
+              "name": "due_date",
+              "value": "2026-04-10"
+            }
+          ],
+          "number": [
+            {
+              "name": "days_overdue",
+              "value": 4
+            }
+          ]
+        }
+      },
+      "id": "set_followup_data",
+      "name": "Sample Overdue Item",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        520,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "subject",
+              "value": "={{`Follow-up: ${$json.po_number} (${ $json.days_overdue } days overdue)`}}"
+            },
+            {
+              "name": "to",
+              "value": "={{$json.vendor_email}}"
+            },
+            {
+              "name": "message",
+              "value": "={{`Dear ${$json.vendor_name},\n\nThis is a friendly follow-up from ${$json.department}.\nPO Number: ${$json.po_number}\nInvoice Number: ${$json.invoice_number}\nDue Date: ${$json.due_date}\nDays Overdue: ${$json.days_overdue}\n\nPlease share an update on expected completion/payment status.\n\nThank you.`}}"
+            },
+            {
+              "name": "next_step",
+              "value": "Connect this output to an Email Send node or Telegram node"
+            }
+          ]
+        }
+      },
+      "id": "set_email_draft",
+      "name": "Draft Reminder Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        820,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Daily Trigger": {
+      "main": [
+        [
+          {
+            "node": "Sample Overdue Item",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sample Overdue Item": {
+      "main": [
+        [
+          {
+            "node": "Draft Reminder Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1",
+  "id": "workflow_vendor_followup_email_draft"
+}
