@@ -21,7 +21,8 @@ n8n-procurement-automation/
     └── examples/
         ├── 01_manual_test_workflow.json
         ├── 02_daily_procurement_stub.json
-        └── 03_vendor_followup_email_draft.json
+        ├── 03_vendor_followup_email_draft.json
+        └── 04_google_sheets_overdue_followup_stub.json
 ```
 
 ## Quick Start
@@ -72,6 +73,11 @@ Suggested first practical workflow:
 
 - `03_vendor_followup_email_draft.json`: daily draft message for overdue procurement follow-up.
 - Replace the final "Draft Reminder Message" node with your real Email or Telegram node.
+
+Second practical workflow template:
+
+- `04_google_sheets_overdue_followup_stub.json`: Cron -> mock row (replace with Google Sheets node) -> overdue check -> follow-up payload.
+- Replace "Mock Google Sheets Row" with a real Google Sheets read node, then connect Email/Telegram after "Prepare Follow-up Payload".
 
 ## GitHub Upload
 
