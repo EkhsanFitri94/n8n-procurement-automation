@@ -61,6 +61,32 @@ Windows helper (creates `.env` if missing, then starts Docker):
 
 - http://localhost:5678
 
+## Common Commands
+
+Start in background:
+
+```bash
+docker compose up -d
+```
+
+View container status:
+
+```bash
+docker compose ps
+```
+
+View logs:
+
+```bash
+docker compose logs -f n8n
+```
+
+Stop the project:
+
+```bash
+docker compose down
+```
+
 ## Import Example Workflows
 
 In n8n UI:
@@ -97,6 +123,7 @@ git push -u origin main
 - `.n8n/` runtime data is ignored by git.
 - Do not commit `.env` with real credentials.
 - For production, run behind HTTPS reverse proxy.
+- The compose file includes a healthcheck so container status reflects real service readiness.
 
 ## CI
 
