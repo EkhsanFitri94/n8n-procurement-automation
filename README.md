@@ -24,7 +24,8 @@ n8n-procurement-automation/
         ├── 03_vendor_followup_email_draft.json
         ├── 04_google_sheets_overdue_followup_stub.json
         ├── 05_purchase_request_webhook_triage_stub.json
-        └── 06_purchase_request_approval_chain_stub.json
+        ├── 06_purchase_request_approval_chain_stub.json
+        └── 07_manager_decision_callback_stub.json
 ```
 
 ## Quick Start
@@ -128,6 +129,23 @@ Example test payload for `06`:
     "amount": 12800,
     "manager_email": "manager@example.com",
     "procurement_queue": "procurement-team"
+}
+```
+
+Fifth practical workflow template:
+
+- `07_manager_decision_callback_stub.json`: Manager callback webhook -> decision normalization -> approve/reject branching -> JSON response.
+- Use this as the second endpoint after `06` to complete the decision handoff.
+
+Example test payload for `07`:
+
+```json
+{
+    "request_id": "REQ-2026-0007",
+    "decision": "approve",
+    "amount": 12800,
+    "manager_email": "manager@example.com",
+    "comment": "Approved for Q2 operations"
 }
 ```
 

@@ -1,0 +1,228 @@
+{
+  "name": "07 - Manager Decision Callback Stub",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "procurement/manager-decision",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook_07_in",
+      "name": "Manager Decision Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        220,
+        320
+      ],
+      "webhookId": "manager_decision_callback"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "request_id",
+              "value": "={{$json.body.request_id || 'REQ-2001'}}"
+            },
+            {
+              "name": "decision",
+              "value": "={{($json.body.decision || 'reject').toLowerCase()}}"
+            },
+            {
+              "name": "manager_email",
+              "value": "={{$json.body.manager_email || 'manager@example.com'}}"
+            },
+            {
+              "name": "comment",
+              "value": "={{$json.body.comment || 'No comment provided'}}"
+            }
+          ],
+          "number": [
+            {
+              "name": "amount",
+              "value": "={{$json.body.amount || 0}}"
+            }
+          ]
+        }
+      },
+      "id": "set_07_normalize",
+      "name": "Normalize Decision",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        500,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.decision}}",
+              "operation": "equal",
+              "value2": "approve"
+            }
+          ]
+        }
+      },
+      "id": "if_07_approved",
+      "name": "Decision Is Approve?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        780,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "approved"
+            },
+            {
+              "name": "next_action",
+              "value": "Proceed to PO creation and procurement execution"
+            },
+            {
+              "name": "notify_team",
+              "value": "procurement-team"
+            },
+            {
+              "name": "template_note",
+              "value": "Replace with ERP task creation or procurement notification node"
+            }
+          ]
+        }
+      },
+      "id": "set_07_approved",
+      "name": "Approved Path",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "status",
+              "value": "rejected"
+            },
+            {
+              "name": "next_action",
+              "value": "Close request and notify requester with manager comment"
+            },
+            {
+              "name": "notify_team",
+              "value": "requester"
+            },
+            {
+              "name": "template_note",
+              "value": "Replace with rejection email or ticket update node"
+            }
+          ]
+        }
+      },
+      "id": "set_07_rejected",
+      "name": "Rejected Path",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "responseBody": "={{JSON.stringify({\"status\":\"ok\",\"request_id\":$json.request_id,\"decision\":$json.decision,\"result\":$json.status,\"next_action\":$json.next_action,\"comment\":$json.comment})}}",
+        "responseCode": 200
+      },
+      "id": "respond_07",
+      "name": "Respond Decision Status",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        320
+      ]
+    }
+  ],
+  "connections": {
+    "Manager Decision Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Decision",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Decision": {
+      "main": [
+        [
+          {
+            "node": "Decision Is Approve?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decision Is Approve?": {
+      "main": [
+        [
+          {
+            "node": "Approved Path",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Rejected Path",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved Path": {
+      "main": [
+        [
+          {
+            "node": "Respond Decision Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rejected Path": {
+      "main": [
+        [
+          {
+            "node": "Respond Decision Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1",
+  "id": "workflow_manager_decision_callback_stub"
+}
