@@ -1,0 +1,232 @@
+{
+  "name": "08 - Requester Notification Stub",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "procurement/requester-notify",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook_08_in",
+      "name": "Notification Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        220,
+        320
+      ],
+      "webhookId": "requester_notification_callback"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "request_id",
+              "value": "={{$json.body.request_id || 'REQ-2001'}}"
+            },
+            {
+              "name": "requester_name",
+              "value": "={{$json.body.requester_name || 'Requester'}}"
+            },
+            {
+              "name": "requester_email",
+              "value": "={{$json.body.requester_email || 'requester@example.com'}}"
+            },
+            {
+              "name": "decision",
+              "value": "={{($json.body.decision || 'rejected').toLowerCase()}}"
+            },
+            {
+              "name": "manager_comment",
+              "value": "={{$json.body.manager_comment || 'No comment provided'}}"
+            }
+          ],
+          "number": [
+            {
+              "name": "amount",
+              "value": "={{$json.body.amount || 0}}"
+            }
+          ]
+        }
+      },
+      "id": "set_08_normalize",
+      "name": "Normalize Notification Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        500,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{$json.decision}}",
+              "operation": "equal",
+              "value2": "approved"
+            }
+          ]
+        }
+      },
+      "id": "if_08_approved",
+      "name": "Approved?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        780,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "subject",
+              "value": "={{`Request ${$json.request_id} approved`}}"
+            },
+            {
+              "name": "to",
+              "value": "={{$json.requester_email}}"
+            },
+            {
+              "name": "message",
+              "value": "={{`Hi ${$json.requester_name},\n\nYour purchase request ${$json.request_id} for amount ${$json.amount} has been approved.\n\nManager comment: ${$json.manager_comment}\n\nProcurement team will proceed with the next steps.`}}"
+            },
+            {
+              "name": "channel_note",
+              "value": "Replace this with your Email, Slack, Telegram, or Teams node"
+            }
+          ]
+        }
+      },
+      "id": "set_08_approved",
+      "name": "Prepare Approved Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "subject",
+              "value": "={{`Request ${$json.request_id} update`}}"
+            },
+            {
+              "name": "to",
+              "value": "={{$json.requester_email}}"
+            },
+            {
+              "name": "message",
+              "value": "={{`Hi ${$json.requester_name},\n\nYour purchase request ${$json.request_id} was not approved at this time.\n\nManager comment: ${$json.manager_comment}\n\nPlease review and resubmit if needed.`}}"
+            },
+            {
+              "name": "channel_note",
+              "value": "Replace this with your Email, Slack, Telegram, or Teams node"
+            }
+          ]
+        }
+      },
+      "id": "set_08_rejected",
+      "name": "Prepare Rejected Message",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "responseBody": "={{JSON.stringify({\"status\":\"ok\",\"request_id\":$json.request_id,\"decision\":$json.decision,\"to\":$json.to,\"subject\":$json.subject})}}",
+        "responseCode": 200
+      },
+      "id": "respond_08",
+      "name": "Respond Notification Payload",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        320
+      ]
+    }
+  ],
+  "connections": {
+    "Notification Trigger": {
+      "main": [
+        [
+          {
+            "node": "Normalize Notification Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Notification Data": {
+      "main": [
+        [
+          {
+            "node": "Approved?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Approved?": {
+      "main": [
+        [
+          {
+            "node": "Prepare Approved Message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Rejected Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Approved Message": {
+      "main": [
+        [
+          {
+            "node": "Respond Notification Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Rejected Message": {
+      "main": [
+        [
+          {
+            "node": "Respond Notification Payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1",
+  "id": "workflow_requester_notification_stub"
+}

@@ -25,7 +25,8 @@ n8n-procurement-automation/
         ├── 04_google_sheets_overdue_followup_stub.json
         ├── 05_purchase_request_webhook_triage_stub.json
         ├── 06_purchase_request_approval_chain_stub.json
-        └── 07_manager_decision_callback_stub.json
+        ├── 07_manager_decision_callback_stub.json
+        └── 08_requester_notification_stub.json
 ```
 
 ## Quick Start
@@ -146,6 +147,24 @@ Example test payload for `07`:
     "amount": 12800,
     "manager_email": "manager@example.com",
     "comment": "Approved for Q2 operations"
+}
+```
+
+Sixth practical workflow template:
+
+- `08_requester_notification_stub.json`: Decision payload intake -> approved/rejected message generation -> channel-ready output.
+- Use this after `07` to notify requester by Email/Telegram/Slack/Teams.
+
+Example test payload for `08`:
+
+```json
+{
+    "request_id": "REQ-2026-0007",
+    "requester_name": "Ekhsan",
+    "requester_email": "requester@example.com",
+    "decision": "approved",
+    "amount": 12800,
+    "manager_comment": "Approved for Q2 operations"
 }
 ```
 
