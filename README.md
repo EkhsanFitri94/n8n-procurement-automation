@@ -17,6 +17,9 @@ n8n-procurement-automation/
 ├── .gitignore
 ├── docker-compose.yml
 ├── README.md
+├── scripts/
+│   ├── start.ps1
+│   └── test-approval-chain.ps1
 └── workflows/
     └── examples/
         ├── 01_manual_test_workflow.json
@@ -89,6 +92,18 @@ Stop the project:
 
 ```bash
 docker compose down
+```
+
+Run approval chain smoke test (`06 -> 07 -> 08`):
+
+```powershell
+.\scripts\test-approval-chain.ps1
+```
+
+If your Basic Auth credentials are different:
+
+```powershell
+.\scripts\test-approval-chain.ps1 -Username "admin" -Password "your-password"
 ```
 
 ## Import Example Workflows
@@ -187,6 +202,7 @@ git push -u origin main
 - Do not commit `.env` with real credentials.
 - For production, run behind HTTPS reverse proxy.
 - The compose file includes a healthcheck so container status reflects real service readiness.
+- For webhook smoke testing, import and activate workflows `06`, `07`, and `08` in n8n.
 
 ## CI
 
