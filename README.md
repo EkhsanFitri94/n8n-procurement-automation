@@ -22,7 +22,8 @@ n8n-procurement-automation/
         ├── 01_manual_test_workflow.json
         ├── 02_daily_procurement_stub.json
         ├── 03_vendor_followup_email_draft.json
-        └── 04_google_sheets_overdue_followup_stub.json
+        ├── 04_google_sheets_overdue_followup_stub.json
+        └── 05_purchase_request_webhook_triage_stub.json
 ```
 
 ## Quick Start
@@ -104,6 +105,11 @@ Second practical workflow template:
 
 - `04_google_sheets_overdue_followup_stub.json`: Cron -> mock row (replace with Google Sheets node) -> overdue check -> follow-up payload.
 - Replace "Mock Google Sheets Row" with a real Google Sheets read node, then connect Email/Telegram after "Prepare Follow-up Payload".
+
+Third practical workflow template:
+
+- `05_purchase_request_webhook_triage_stub.json`: Webhook intake -> normalize request -> high-value check -> triage result response.
+- Use this as a starter for approval routing (manager approval for high-value requests).
 
 ## GitHub Upload
 

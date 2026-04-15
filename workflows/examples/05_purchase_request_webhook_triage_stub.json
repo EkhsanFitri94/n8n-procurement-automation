@@ -1,0 +1,212 @@
+{
+  "name": "05 - Purchase Request Webhook Triage Stub",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "procurement/purchase-request",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook_in",
+      "name": "Incoming Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        240,
+        320
+      ],
+      "webhookId": "purchase_request_triage"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "request_id",
+              "value": "={{$json.body.request_id || 'REQ-0001'}}"
+            },
+            {
+              "name": "requester",
+              "value": "={{$json.body.requester || 'Requester Name'}}"
+            },
+            {
+              "name": "department",
+              "value": "={{$json.body.department || 'Procurement'}}"
+            },
+            {
+              "name": "category",
+              "value": "={{$json.body.category || 'General'}}"
+            }
+          ],
+          "number": [
+            {
+              "name": "amount",
+              "value": "={{$json.body.amount || 0}}"
+            }
+          ]
+        }
+      },
+      "id": "set_fields",
+      "name": "Normalize Request",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        520,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.amount}}",
+              "operation": "larger",
+              "value2": 10000
+            }
+          ]
+        }
+      },
+      "id": "if_budget",
+      "name": "High Value Request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        800,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "triage_result",
+              "value": "manager_approval_required"
+            },
+            {
+              "name": "next_action",
+              "value": "Send to manager for approval and SLA tracking"
+            }
+          ]
+        }
+      },
+      "id": "set_high",
+      "name": "Mark Manager Approval",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "triage_result",
+              "value": "standard_approval"
+            },
+            {
+              "name": "next_action",
+              "value": "Continue normal procurement process"
+            }
+          ]
+        }
+      },
+      "id": "set_standard",
+      "name": "Mark Standard Flow",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1080,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "responseBody": "={{JSON.stringify({\"status\":\"ok\",\"request_id\":$json.request_id,\"triage_result\":$json.triage_result,\"next_action\":$json.next_action})}}",
+        "responseCode": 200
+      },
+      "id": "respond",
+      "name": "Respond JSON",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1360,
+        320
+      ]
+    }
+  ],
+  "connections": {
+    "Incoming Request": {
+      "main": [
+        [
+          {
+            "node": "Normalize Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Request": {
+      "main": [
+        [
+          {
+            "node": "High Value Request?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "High Value Request?": {
+      "main": [
+        [
+          {
+            "node": "Mark Manager Approval",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Mark Standard Flow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Manager Approval": {
+      "main": [
+        [
+          {
+            "node": "Respond JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Standard Flow": {
+      "main": [
+        [
+          {
+            "node": "Respond JSON",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1",
+  "id": "workflow_purchase_request_webhook_triage_stub"
+}
