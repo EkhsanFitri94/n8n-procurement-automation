@@ -19,6 +19,8 @@ n8n-procurement-automation/
 ├── README.md
 ├── scripts/
 │   ├── start.ps1
+│   ├── stop.ps1
+│   ├── reset.ps1
 │   └── test-approval-chain.ps1
 └── workflows/
     └── examples/
@@ -92,6 +94,24 @@ Stop the project:
 
 ```bash
 docker compose down
+```
+
+Windows stop helper:
+
+```powershell
+.\scripts\stop.ps1
+```
+
+Reset and restart project:
+
+```powershell
+.\scripts\reset.ps1
+```
+
+Reset, restart, and clear local n8n data:
+
+```powershell
+.\scripts\reset.ps1 -DeleteData
 ```
 
 Run approval chain smoke test (`06 -> 07 -> 08`):
