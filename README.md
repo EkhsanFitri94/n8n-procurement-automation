@@ -23,7 +23,8 @@ n8n-procurement-automation/
         ├── 02_daily_procurement_stub.json
         ├── 03_vendor_followup_email_draft.json
         ├── 04_google_sheets_overdue_followup_stub.json
-        └── 05_purchase_request_webhook_triage_stub.json
+        ├── 05_purchase_request_webhook_triage_stub.json
+        └── 06_purchase_request_approval_chain_stub.json
 ```
 
 ## Quick Start
@@ -110,6 +111,25 @@ Third practical workflow template:
 
 - `05_purchase_request_webhook_triage_stub.json`: Webhook intake -> normalize request -> high-value check -> triage result response.
 - Use this as a starter for approval routing (manager approval for high-value requests).
+
+Fourth practical workflow template:
+
+- `06_purchase_request_approval_chain_stub.json`: Webhook intake -> amount threshold check -> route to manager or procurement -> JSON status response.
+- Use this as a base for approval chain automation with real notification/integration nodes.
+
+Example test payload for `06`:
+
+```json
+{
+    "request_id": "REQ-2026-0007",
+    "requester": "Ekhsan",
+    "department": "Procurement",
+    "item": "Network Switch",
+    "amount": 12800,
+    "manager_email": "manager@example.com",
+    "procurement_queue": "procurement-team"
+}
+```
 
 ## GitHub Upload
 

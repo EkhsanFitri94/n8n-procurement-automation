@@ -1,0 +1,236 @@
+{
+  "name": "06 - Purchase Request Approval Chain Stub",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "procurement/approval-chain",
+        "responseMode": "responseNode"
+      },
+      "id": "webhook_06_in",
+      "name": "Incoming Approval Request",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [
+        220,
+        320
+      ],
+      "webhookId": "purchase_request_approval_chain"
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "request_id",
+              "value": "={{$json.body.request_id || 'REQ-2001'}}"
+            },
+            {
+              "name": "requester",
+              "value": "={{$json.body.requester || 'Requester Name'}}"
+            },
+            {
+              "name": "department",
+              "value": "={{$json.body.department || 'Procurement'}}"
+            },
+            {
+              "name": "item",
+              "value": "={{$json.body.item || 'Laptop'}}"
+            },
+            {
+              "name": "manager_email",
+              "value": "={{$json.body.manager_email || 'manager@example.com'}}"
+            },
+            {
+              "name": "procurement_queue",
+              "value": "={{$json.body.procurement_queue || 'procurement-team'}}"
+            }
+          ],
+          "number": [
+            {
+              "name": "amount",
+              "value": "={{$json.body.amount || 0}}"
+            }
+          ]
+        }
+      },
+      "id": "set_06_normalize",
+      "name": "Normalize Request",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        500,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{$json.amount}}",
+              "operation": "larger",
+              "value2": 10000
+            }
+          ]
+        }
+      },
+      "id": "if_06_high_value",
+      "name": "Requires Manager Approval?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        780,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "approval_stage",
+              "value": "manager_approval_pending"
+            },
+            {
+              "name": "assigned_to",
+              "value": "={{$json.manager_email}}"
+            },
+            {
+              "name": "next_action",
+              "value": "Send manager approval request and wait for response"
+            },
+            {
+              "name": "template_note",
+              "value": "Replace this with Email/Slack/Teams node to notify manager"
+            }
+          ]
+        }
+      },
+      "id": "set_06_manager",
+      "name": "Route To Manager",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": false,
+        "values": {
+          "string": [
+            {
+              "name": "approval_stage",
+              "value": "auto_approved_for_procurement"
+            },
+            {
+              "name": "assigned_to",
+              "value": "={{$json.procurement_queue}}"
+            },
+            {
+              "name": "next_action",
+              "value": "Create PO and continue standard procurement process"
+            },
+            {
+              "name": "template_note",
+              "value": "Replace this with task creation or ERP integration node"
+            }
+          ]
+        }
+      },
+      "id": "set_06_procurement",
+      "name": "Route To Procurement",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "responseBody": "={{JSON.stringify({\"status\":\"received\",\"request_id\":$json.request_id,\"amount\":$json.amount,\"approval_stage\":$json.approval_stage,\"assigned_to\":$json.assigned_to,\"next_action\":$json.next_action})}}",
+        "responseCode": 200
+      },
+      "id": "respond_06",
+      "name": "Respond Status",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [
+        1340,
+        320
+      ]
+    }
+  ],
+  "connections": {
+    "Incoming Approval Request": {
+      "main": [
+        [
+          {
+            "node": "Normalize Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Request": {
+      "main": [
+        [
+          {
+            "node": "Requires Manager Approval?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Requires Manager Approval?": {
+      "main": [
+        [
+          {
+            "node": "Route To Manager",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Route To Procurement",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route To Manager": {
+      "main": [
+        [
+          {
+            "node": "Respond Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route To Procurement": {
+      "main": [
+        [
+          {
+            "node": "Respond Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1",
+  "id": "workflow_purchase_request_approval_chain_stub"
+}
